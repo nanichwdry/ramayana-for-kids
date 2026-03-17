@@ -1,0 +1,83 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    // User: { email: string, role: string, createdAt: timestamp }
+    // ChildProfile: { parentId: string, name: string, ageGroup: string, avatar: string, totalStars: int, currentStreak: int }
+    // StoryArc: { title: map, description: map, order: int, thumbnail: string, isPublished: bool }
+    // Lesson: { arcId: string, order: int, videoUrl: string, translations: map, quizSet: map, activityConfig: map, isPremium: bool }
+    // Progress: { childId: string, lessonId: string, status: string, quizScore: int, completedAt: timestamp }
+    
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+         request.auth.token.email == "mvajje@gmail.com");
+    }
+    
+    function isParent(parentId) {
+      return isAuthenticated() && request.auth.uid == parentId;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['email', 'role']) &&
+             data.email is string &&
+             data.role in ['parent', 'admin', 'editor'];
+    }
+
+    function isValidChild(data) {
+      return data.keys().hasAll(['parentId', 'name', 'ageGroup']) &&
+             data.parentId == request.auth.uid &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 50 &&
+             data.ageGroup in ['5-7', '8-10', '11-12'];
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && isValidUser(request.resource.data) && request.resource.data.role == 'parent';
+      allow update: if isOwner(userId) && isValidUser(request.resource.data) && request.resource.data.role == resource.data.role;
+      allow write: if isAdmin();
+    }
+
+    match /children/{childId} {
+      allow read: if isAuthenticated() && (resource.data.parentId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && isValidChild(request.resource.data);
+      allow update: if isAuthenticated() && resource.data.parentId == request.auth.uid && isValidChild(request.resource.data);
+      allow delete: if isAuthenticated() && resource.data.parentId == request.auth.uid;
+    }
+
+    match /story_arcs/{arcId} {
+      allow read: if true; // Publicly readable for the map
+      allow write: if isAdmin();
+    }
+
+    match /lessons/{lessonId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /progress/{progressId} {
+      allow read: if isAuthenticated() && (get(/databases/$(database)/documents/children/$(resource.data.childId)).data.parentId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && get(/databases/$(database)/documents/children/$(request.resource.data.childId)).data.parentId == request.auth.uid;
+      allow update: if isAuthenticated() && get(/databases/$(database)/documents/children/$(resource.data.childId)).data.parentId == request.auth.uid;
+    }
+  }
+}

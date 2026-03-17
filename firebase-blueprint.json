@@ -1,0 +1,92 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Parent or Admin user account",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email" },
+        "role": { "type": "string", "enum": ["parent", "admin", "editor"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "role"]
+    },
+    "ChildProfile": {
+      "title": "Child Profile",
+      "description": "Profile for a child learner",
+      "type": "object",
+      "properties": {
+        "parentId": { "type": "string" },
+        "name": { "type": "string" },
+        "ageGroup": { "type": "string", "enum": ["5-7", "8-10", "11-12"] },
+        "avatar": { "type": "string" },
+        "totalStars": { "type": "integer" },
+        "currentStreak": { "type": "integer" }
+      },
+      "required": ["parentId", "name", "ageGroup"]
+    },
+    "StoryArc": {
+      "title": "Story Arc",
+      "description": "A season or major section of the Ramayana (e.g., Ayodhya Kand)",
+      "type": "object",
+      "properties": {
+        "title": { "type": "object" },
+        "description": { "type": "object" },
+        "order": { "type": "integer" },
+        "thumbnail": { "type": "string" },
+        "isPublished": { "type": "boolean" }
+      },
+      "required": ["title", "order"]
+    },
+    "Lesson": {
+      "title": "Lesson",
+      "description": "A specific chapter within a story arc",
+      "type": "object",
+      "properties": {
+        "arcId": { "type": "string" },
+        "order": { "type": "integer" },
+        "videoUrl": { "type": "string" },
+        "translations": { "type": "object" },
+        "quizSet": { "type": "object" },
+        "activityConfig": { "type": "object" },
+        "isPremium": { "type": "boolean" }
+      },
+      "required": ["arcId", "order"]
+    },
+    "Progress": {
+      "title": "Progress",
+      "description": "Tracking child's progress through lessons",
+      "type": "object",
+      "properties": {
+        "childId": { "type": "string" },
+        "lessonId": { "type": "string" },
+        "status": { "type": "string", "enum": ["started", "completed"] },
+        "quizScore": { "type": "integer" },
+        "completedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["childId", "lessonId", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User accounts"
+    },
+    "/children/{childId}": {
+      "schema": "ChildProfile",
+      "description": "Child profiles"
+    },
+    "/story_arcs/{arcId}": {
+      "schema": "StoryArc",
+      "description": "Major story sections"
+    },
+    "/lessons/{lessonId}": {
+      "schema": "Lesson",
+      "description": "Individual chapters"
+    },
+    "/progress/{progressId}": {
+      "schema": "Progress",
+      "description": "User progress tracking"
+    }
+  }
+}
