@@ -21,6 +21,7 @@ import { Language } from '../translations';
 import { storyArcs, Chapter, getArcByChapterId, resolveText } from '../data/storyData';
 import { characters, CharacterProfile } from '../data/characters';
 
+const API_BASE = import.meta.env.VITE_API_URL || '';
 const HERO_IMAGE = '/group-illustration.png';
 const FALLBACK_IMAGE = '/group-illustration.png';
 
@@ -148,7 +149,7 @@ function StoryPlayer({ chapter, onBack }: { chapter: Chapter, onBack: () => void
     if (pageSvgs[pageIndex] || svgLoading[pageIndex]) return;
     setSvgLoading(prev => ({ ...prev, [pageIndex]: true }));
     try {
-      const res = await fetch('/api/generate-image', {
+      const res = await fetch(`${API_BASE}/api/generate-image`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: `A child-friendly illustration for a Ramayana story page: "${pageText}"` }),
@@ -168,7 +169,7 @@ function StoryPlayer({ chapter, onBack }: { chapter: Chapter, onBack: () => void
     const fetchStory = async () => {
       setLoading(true);
       try {
-        const res = await fetch('/api/generate-story', {
+        const res = await fetch(`${API_BASE}/api/generate-story`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -627,7 +628,7 @@ function QuizView({ chapter, onBack, onDone }: { chapter: Chapter; onBack: () =>
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch('/api/generate-quiz', {
+        const res = await fetch(`${API_BASE}/api/generate-quiz`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ chapterTitle: chapter.title.en, moral: chapter.moral.en, language }),

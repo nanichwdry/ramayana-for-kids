@@ -31,7 +31,17 @@ const vertexAI = new GoogleGenAI({
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = parseInt(process.env.PORT || '3000');
+
+  // CORS for frontend on different domain (Vercel)
+  app.use((req, res, next) => {
+    const origin = req.headers.origin || '';
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    if (req.method === 'OPTIONS') return res.sendStatus(200);
+    next();
+  });
 
   app.use(express.json());
 
