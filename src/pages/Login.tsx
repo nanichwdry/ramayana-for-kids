@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { signInWithRedirect, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
@@ -9,14 +9,9 @@ export default function Login() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleGoogleLogin = async () => {
-    try {
-      const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-      navigate('/');
-    } catch (err: any) {
-      setError(err.message);
-    }
+  const handleGoogleLogin = () => {
+    const provider = new GoogleAuthProvider();
+    signInWithRedirect(auth, provider).catch((err: any) => setError(err.message));
   };
 
   return (
