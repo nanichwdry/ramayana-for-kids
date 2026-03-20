@@ -8,11 +8,11 @@ import dotenv from "dotenv";
 
 dotenv.config({ path: '.env.local' });
 
-// If GOOGLE_APPLICATION_CREDENTIALS_JSON env var exists (Vercel),
-// write it to a temp file and set GOOGLE_APPLICATION_CREDENTIALS
-if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON && !process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+// Write service account JSON to temp file for Vertex AI auth
+const saJson = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON || process.env.GOOGLE_APPLICATION_CREDENTIALS || '';
+if (saJson && saJson.includes('"type"')) {
   const tmpPath = '/tmp/gcp-sa-key.json';
-  fs.writeFileSync(tmpPath, process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+  fs.writeFileSync(tmpPath, saJson);
   process.env.GOOGLE_APPLICATION_CREDENTIALS = tmpPath;
 }
 
