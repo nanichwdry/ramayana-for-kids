@@ -1,46 +1,33 @@
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
 import { GoogleGenAI, Modality } from "@google/genai";
 import dotenv from "dotenv";
 
 dotenv.config({ path: '.env.local' });
 
+// If GOOGLE_APPLICATION_CREDENTIALS_JSON env var exists (Vercel),
+// write it to a temp file and set GOOGLE_APPLICATION_CREDENTIALS
+if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON && !process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+  const tmpPath = '/tmp/gcp-sa-key.json';
+  fs.writeFileSync(tmpPath, process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+  process.env.GOOGLE_APPLICATION_CREDENTIALS = tmpPath;
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Gemini client for text generation
+// Gemini API client for text generation (story, quiz)
 const gemini = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 
-// Vertex AI client for image generation
+// Vertex AI client for image generation only
 const vertexAI = new GoogleGenAI({
   vertexai: true,
-  project: 'ramayana-for-kids-490602',
-  location: 'us-central1',
+  project: process.env.GOOGLE_CLOUD_PROJECT || 'ramayana-for-kids-490602',
+  location: process.env.GOOGLE_CLOUD_LOCATION || 'us-central1',
 });
-
-function pcmToWav(pcm: Buffer, sampleRate: number): Buffer {
-  const header = Buffer.alloc(44);
-  const numChannels = 1;
-  const bitsPerSample = 16;
-  const byteRate = sampleRate * numChannels * bitsPerSample / 8;
-  const blockAlign = numChannels * bitsPerSample / 8;
-  header.write('RIFF', 0);
-  header.writeUInt32LE(36 + pcm.length, 4);
-  header.write('WAVE', 8);
-  header.write('fmt ', 12);
-  header.writeUInt32LE(16, 16);
-  header.writeUInt16LE(1, 20);
-  header.writeUInt16LE(numChannels, 22);
-  header.writeUInt32LE(sampleRate, 24);
-  header.writeUInt32LE(byteRate, 28);
-  header.writeUInt16LE(blockAlign, 32);
-  header.writeUInt16LE(bitsPerSample, 34);
-  header.write('data', 36);
-  header.writeUInt32LE(pcm.length, 40);
-  return Buffer.concat([header, pcm]);
-}
 
 async function startServer() {
   const app = express();
@@ -101,78 +88,13 @@ correct is the 0-based index. Keep questions simple and fun for kids.`,
     }
   });
 
-  // Text-to-speech endpoint using Gemini Live API
-  app.post("/api/tts", async (req, res) => {
-    try {
-      const { text, voice } = req.body;
-      if (!text) return res.status(400).json({ error: "text required" });
-
-      const audioChunks: Buffer[] = [];
-      let resolveResponse!: () => void;
-      let rejectResponse!: (e: any) => void;
-
-      const responseComplete = new Promise<void>((resolve, reject) => {
-        resolveResponse = resolve;
-        rejectResponse = reject;
-      });
-
-      const session = await gemini.live.connect({
-        model: 'gemini-2.0-flash-live-001',
-        config: {
-          responseModalities: [Modality.AUDIO],
-          speechConfig: {
-            voiceConfig: {
-              prebuiltVoiceConfig: { voiceName: voice || 'Kore' }
-            }
-          }
-        },
-        callbacks: {
-          onmessage: (msg: any) => {
-            const parts = msg.serverContent?.modelTurn?.parts || [];
-            for (const part of parts) {
-              if (part.inlineData?.data) {
-                audioChunks.push(Buffer.from(part.inlineData.data, 'base64'));
-              }
-            }
-            if (msg.serverContent?.turnComplete) {
-              resolveResponse();
-            }
-          },
-          onerror: (e: any) => rejectResponse(e),
-          onclose: () => resolveResponse(),
-        }
-      });
-
-      await session.sendClientContent({
-        turns: [{ role: 'user', parts: [{ text }] }],
-        turnComplete: true
-      });
-
-      await responseComplete;
-      session.close();
-
-      if (audioChunks.length === 0) {
-        return res.status(500).json({ error: "No audio generated" });
-      }
-
-      // Concatenate PCM16 chunks and convert to WAV (24kHz)
-      const pcm = Buffer.concat(audioChunks);
-      const wav = pcmToWav(pcm, 24000);
-      res.set('Content-Type', 'audio/wav');
-      return res.send(wav);
-    } catch (e: any) {
-      console.error("TTS error:", e.message);
-      res.status(500).json({ error: e.message });
-    }
-  });
-
-  // Image generation endpoint using Gemini API
+  // Image generation endpoint using Vertex AI
   app.post("/api/generate-image", async (req, res) => {
     try {
       const { prompt } = req.body;
       if (!prompt) return res.status(400).json({ error: "prompt required" });
 
-      const response = await gemini.models.generateContent({
+      const response = await vertexAI.models.generateContent({
         model: "gemini-2.5-flash-image",
         contents: [{
           role: "user",

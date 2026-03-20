@@ -141,21 +141,8 @@ function StoryPlayer({ chapter, onBack }: { chapter: Chapter, onBack: () => void
   const [currentPage, setCurrentPage] = useState(0);
   const [loading, setLoading] = useState(true);
   const [isReading, setIsReading] = useState(false);
-  const [audioLoading, setAudioLoading] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [selectedVoice, setSelectedVoice] = useState<string>('Kore');
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const [showQuiz, setShowQuiz] = useState(false);
-
-  const geminiVoices = [
-    { name: 'Kore', label: 'Kore (Bright)' },
-    { name: 'Puck', label: 'Puck (Upbeat)' },
-    { name: 'Charon', label: 'Charon (Warm)' },
-    { name: 'Fenrir', label: 'Fenrir (Calm)' },
-    { name: 'Aoede', label: 'Aoede (Gentle)' },
-    { name: 'Leda', label: 'Leda (Soft)' },
-    { name: 'Orus', label: 'Orus (Deep)' },
-    { name: 'Zephyr', label: 'Zephyr (Breezy)' },
-  ];
 
   const generateSvg = async (pageIndex: number, pageText: string) => {
     if (pageSvgs[pageIndex] || svgLoading[pageIndex]) return;
@@ -202,7 +189,7 @@ function StoryPlayer({ chapter, onBack }: { chapter: Chapter, onBack: () => void
       }
     };
     fetchStory();
-    return () => { audioRef.current?.pause(); };
+    return () => { speechSynthesis.cancel(); };
   }, [chapter, language]);
 
   useEffect(() => {
@@ -210,36 +197,24 @@ function StoryPlayer({ chapter, onBack }: { chapter: Chapter, onBack: () => void
     generateSvg(currentPage, storyPages[currentPage]);
   }, [currentPage, storyPages]);
 
-  const readAloud = async () => {
+  const readAloud = () => {
     if (isReading) {
-      audioRef.current?.pause();
+      speechSynthesis.cancel();
       setIsReading(false);
       return;
     }
-    setAudioLoading(true);
-    try {
-      const res = await fetch('/api/tts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: storyPages[currentPage], voice: selectedVoice }),
-      });
-      if (!res.ok) throw new Error('TTS failed');
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const audio = new Audio(url);
-      audio.onended = () => { setIsReading(false); URL.revokeObjectURL(url); };
-      audioRef.current = audio;
-      setIsReading(true);
-      audio.play();
-    } catch (e) {
-      console.error('TTS error:', e);
-    } finally {
-      setAudioLoading(false);
-    }
+    const utterance = new SpeechSynthesisUtterance(storyPages[currentPage]);
+    const langMap: Record<string, string> = { en: 'en-US', te: 'te-IN', hi: 'hi-IN', ta: 'ta-IN' };
+    utterance.lang = langMap[language] || 'en-US';
+    utterance.rate = 0.85;
+    utterance.onend = () => setIsReading(false);
+    utteranceRef.current = utterance;
+    setIsReading(true);
+    speechSynthesis.speak(utterance);
   };
 
   const goToPage = (dir: number) => {
-    audioRef.current?.pause();
+    speechSynthesis.cancel();
     setIsReading(false);
     setCurrentPage(p => Math.max(0, Math.min(storyPages.length - 1, p + dir)));
   };
@@ -272,12 +247,7 @@ function StoryPlayer({ chapter, onBack }: { chapter: Chapter, onBack: () => void
             <option value="hi" className="text-black">हिन्दी</option>
             <option value="ta" className="text-black">தமிழ்</option>
           </select>
-          <select value={selectedVoice} onChange={e => setSelectedVoice(e.target.value)}
-            className="bg-white/10 text-white text-sm rounded-lg px-2 py-1.5 focus:outline-none cursor-pointer">
-            {geminiVoices.map(v => (
-              <option key={v.name} value={v.name} className="text-black">{v.label}</option>
-            ))}
-          </select>
+
         </div>
       </div>
 
@@ -349,10 +319,8 @@ function StoryPlayer({ chapter, onBack }: { chapter: Chapter, onBack: () => void
                 className={`flex items-center gap-2 px-6 py-3 rounded-xl transition-all ${isReading ? 'text-white' : 'bg-white/10 hover:bg-white/20'}`}
                 style={isReading ? {backgroundColor: currentArc?.color || '#fb923c'} : {}}
               >
-                {audioLoading ? (
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                ) : isReading ? <Pause className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-                {audioLoading ? 'Loading...' : isReading ? 'Stop' : 'Read Aloud'}
+                {isReading ? <Pause className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                {isReading ? 'Stop' : 'Read Aloud'}
               </button>
               <button onClick={() => goToPage(1)} disabled={currentPage === storyPages.length - 1}
                 className="flex items-center gap-2 px-6 py-3 rounded-xl disabled:opacity-30 disabled:cursor-not-allowed transition-all font-bold"

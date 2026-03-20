@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"const { GoogleGenAI } = require\\(''@google/genai''\\); const ai = new GoogleGenAI\\({ apiKey: ''test'' }\\); const proto = Object.getPrototypeOf\\(ai.live\\); console.log\\(Object.getOwnPropertyNames\\(proto\\)\\);\")"
+    ]
+  }
+}
