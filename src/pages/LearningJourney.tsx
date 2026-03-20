@@ -46,7 +46,7 @@ export default function LearningJourney() {
           {selectedChapter ? (
             <StoryPlayer chapter={selectedChapter} onBack={() => setSelectedChapter(null)} />
           ) : (
-            <div className="max-w-7xl mx-auto p-6 md:p-12 space-y-12 pb-24">
+            <div className="max-w-7xl mx-auto p-3 sm:p-6 md:p-12 space-y-6 md:space-y-12 pb-24">
               {/* Language selector bar */}
               <div className="flex justify-end">
                 <div className="flex items-center gap-1 bg-white/10 rounded-full p-1">
@@ -99,34 +99,35 @@ export default function LearningJourney() {
 function HeroSection({ onSelectChapter }: { onSelectChapter: () => void }) {
   const { t } = useLanguage();
   return (
-    <div className="relative h-[60vh] rounded-[2.5rem] overflow-hidden group bg-gradient-to-br from-orange-900 to-amber-950">
-      <img 
+    <div className="relative h-[40vh] sm:h-[60vh] rounded-[1.5rem] sm:rounded-[2.5rem] overflow-hidden group bg-gradient-to-br from-orange-900 to-amber-950">
+      <img
         src={HERO_IMAGE}
         alt="Ramayana Characters Illustration"
-        className="w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-1000" 
+        className="w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-1000"
         onError={(e) => { (e.target as HTMLImageElement).src = FALLBACK_IMAGE; }}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
-      <div className="absolute bottom-12 left-12 max-w-2xl space-y-6">
-        <div className="flex items-center gap-2 text-orange-500 font-bold uppercase tracking-[0.3em] text-sm">
-          <Star className="w-4 h-4 fill-orange-500" />
+      <div className="absolute bottom-4 left-4 sm:bottom-12 sm:left-12 max-w-2xl space-y-2 sm:space-y-6">
+        <div className="flex items-center gap-2 text-orange-500 font-bold uppercase tracking-[0.3em] text-xs sm:text-sm">
+          <Star className="w-3 h-3 sm:w-4 sm:h-4 fill-orange-500" />
           {t('featured')}
         </div>
-        <h1 className="text-6xl font-black leading-tight">🏹 Ramayana: The Epic Journey</h1>
-        <p className="text-xl text-gray-300 leading-relaxed">
+        <h1 className="text-2xl sm:text-4xl xl:text-6xl font-black leading-tight">🏹 Ramayana: The Epic Journey</h1>
+        <p className="text-sm sm:text-xl text-gray-300 leading-relaxed hidden sm:block">
           Join Prince Rama on his legendary adventure! Learn about truth, courage, devotion, and the triumph of good over evil.
         </p>
-        <div className="flex gap-4">
-          <button 
+        <div className="flex gap-2 sm:gap-4">
+          <button
             onClick={onSelectChapter}
-            className="bg-orange-500 text-white px-8 py-4 rounded-xl font-bold flex items-center gap-2 hover:bg-orange-600 transition-all active:scale-95"
+            className="bg-orange-500 text-white px-4 py-2 sm:px-8 sm:py-4 rounded-xl font-bold flex items-center gap-2 hover:bg-orange-600 transition-all active:scale-95 text-sm sm:text-base"
           >
-            <Play className="fill-white w-5 h-5" />
+            <Play className="fill-white w-4 h-4 sm:w-5 sm:h-5" />
             Continue Story
           </button>
-          <button className="bg-white/10 backdrop-blur-md text-white px-8 py-4 rounded-xl font-bold flex items-center gap-2 hover:bg-white/20 transition-all">
-            <Info className="w-5 h-5" />
-            About Ramayana
+          <button className="bg-white/10 backdrop-blur-md text-white px-4 py-2 sm:px-8 sm:py-4 rounded-xl font-bold flex items-center gap-2 hover:bg-white/20 transition-all text-sm sm:text-base">
+            <Info className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span className="hidden sm:inline">About Ramayana</span>
+            <span className="sm:hidden">About</span>
           </button>
         </div>
       </div>
@@ -279,7 +280,7 @@ function StoryPlayer({ chapter, onBack }: { chapter: Chapter, onBack: () => void
           )}
         </div>
 
-        <div className="lg:w-1/2 flex flex-col p-8 lg:p-12 overflow-y-auto">
+        <div className="lg:w-1/2 flex flex-col p-4 sm:p-8 lg:p-12 overflow-y-auto">
           {loading ? (
              <div className="space-y-4 animate-pulse">
               <div className="h-4 bg-white/10 rounded w-full" />
@@ -294,7 +295,7 @@ function StoryPlayer({ chapter, onBack }: { chapter: Chapter, onBack: () => void
                 <p className="text-xs font-black uppercase tracking-widest" style={{color: currentArc?.color || '#fb923c'}}>
                   Page {currentPage + 1} of {storyPages.length}
                 </p>
-                <p className="text-2xl lg:text-3xl text-gray-200 leading-relaxed font-medium">
+                <p className="text-base sm:text-2xl lg:text-3xl text-gray-200 leading-relaxed font-medium">
                   {storyPages[currentPage]}
                 </p>
                 {currentPage === storyPages.length - 1 && chapter.moral && (
@@ -311,23 +312,23 @@ function StoryPlayer({ chapter, onBack }: { chapter: Chapter, onBack: () => void
 
           {!loading && (
             <>
-            <div className="flex items-center justify-between mt-12">
+            <div className="flex items-center justify-between mt-4 sm:mt-12 gap-2">
               <button onClick={() => goToPage(-1)} disabled={currentPage === 0}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
-                <ChevronLeft className="w-5 h-5" /> Previous
+                className="flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-2 sm:py-3 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all text-sm sm:text-base">
+                <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" /> <span className="hidden sm:inline">Previous</span><span className="sm:hidden">Prev</span>
               </button>
               <button onClick={readAloud}
-                className={`flex items-center gap-2 px-6 py-3 rounded-xl transition-all ${isReading ? 'text-white' : 'bg-white/10 hover:bg-white/20'}`}
+                className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-2 sm:py-3 rounded-xl transition-all text-sm sm:text-base ${isReading ? 'text-white' : 'bg-white/10 hover:bg-white/20'}`}
                 style={isReading ? {backgroundColor: currentArc?.color || '#fb923c'} : {}}
               >
-                {isReading ? <Pause className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-                {isReading ? 'Stop' : 'Read Aloud'}
+                {isReading ? <Pause className="w-4 h-4 sm:w-5 sm:h-5" /> : <Volume2 className="w-4 h-4 sm:w-5 sm:h-5" />}
+                {isReading ? 'Stop' : <span><span className="hidden sm:inline">Read Aloud</span><span className="sm:hidden">Read</span></span>}
               </button>
               <button onClick={() => goToPage(1)} disabled={currentPage === storyPages.length - 1}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl disabled:opacity-30 disabled:cursor-not-allowed transition-all font-bold"
+                className="flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-2 sm:py-3 rounded-xl disabled:opacity-30 disabled:cursor-not-allowed transition-all font-bold text-sm sm:text-base"
                 style={{backgroundColor: currentArc?.color || '#fb923c'}}
               >
-                Next <ChevronRight className="w-5 h-5" />
+                Next <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             </div>
             {isLastPage && (
@@ -349,14 +350,14 @@ function StoryPlayer({ chapter, onBack }: { chapter: Chapter, onBack: () => void
 function StoryMap({ onSelectChapter }: { onSelectChapter: (c: Chapter) => void }) {
   const { t, language } = useLanguage();
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-12">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 sm:space-y-12">
       {storyArcs.map(arc => (
-        <div key={arc.id} className="space-y-8">
+        <div key={arc.id} className="space-y-4 sm:space-y-8">
            <div className="flex items-center gap-4">
-            <h2 className="text-3xl font-black" style={{color: arc.color}}>{resolveText(arc.title, language)}</h2>
+            <h2 className="text-xl sm:text-3xl font-black" style={{color: arc.color}}>{resolveText(arc.title, language)}</h2>
             <div className="h-px flex-1" style={{background: `linear-gradient(to right, ${arc.color}55, transparent)`}} />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
             {arc.chapters.map((chapter, idx) => (
               <motion.div key={chapter.id} whileHover={{ y: -10 }}
                 onClick={() => chapter.status !== 'locked' && onSelectChapter(chapter)}
@@ -410,13 +411,13 @@ function CharactersView() {
   const { t, language } = useLanguage();
   const [selected, setSelected] = useState<CharacterProfile | null>(null);
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-12">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 sm:space-y-12">
       <div className="flex items-center gap-4">
-        <h2 className="text-4xl font-black">{t('characterProfiles')}</h2>
+        <h2 className="text-2xl sm:text-4xl font-black">{t('characterProfiles')}</h2>
         <span className="bg-orange-500 text-white text-sm font-black px-3 py-1 rounded-full">{characters.length}</span>
         <div className="h-px flex-1 bg-white/10" />
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
         {characters.map(char => (
           <CharacterCard key={char.id} character={char} onClick={() => setSelected(char)} />
         ))}
@@ -532,19 +533,19 @@ function CharacterCard({ character, onClick }: { character: CharacterProfile; on
     <motion.div 
       whileHover={{ y: -8, transition: { duration: 0.2 } }}
       onClick={onClick}
-      className="bg-white/5 p-6 rounded-[2rem] border border-white/10 flex flex-col items-center text-center group cursor-pointer hover:bg-white/10 transition-colors"
+      className="bg-white/5 p-3 sm:p-6 rounded-[1.5rem] sm:rounded-[2rem] border border-white/10 flex flex-col items-center text-center group cursor-pointer hover:bg-white/10 transition-colors"
     >
-      <div className="w-28 h-28 rounded-full mb-4 flex items-center justify-center overflow-hidden transition-all duration-300"
+      <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-full mb-3 sm:mb-4 flex items-center justify-center overflow-hidden transition-all duration-300"
            style={{ backgroundColor: `${cardColor}20`, boxShadow: `0 0 20px ${cardColor}30` }}>
         {!imgError ? (
           <img src={character.image} alt={character.name.en}
             className="w-full h-full object-cover"
             onError={() => setImgError(true)} />
         ) : (
-          <span className="text-5xl">{character.emoji}</span>
+          <span className="text-4xl sm:text-5xl">{character.emoji}</span>
         )}
       </div>
-      <h3 className="text-2xl font-bold" style={{ color: cardColor }}>
+      <h3 className="text-base sm:text-2xl font-bold" style={{ color: cardColor }}>
         {resolveText(character.name, language)}
       </h3>
       <p className="text-sm text-gray-400 italic mb-4">{character.role}</p>
@@ -565,12 +566,12 @@ function RewardsView() {
     { name: '⭐ Hero', unlocked: false },
   ];
   return (
-    <div className="space-y-8">
-      <h2 className="text-4xl font-black">{t('myCollection')}</h2>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+    <div className="space-y-4 sm:space-y-8">
+      <h2 className="text-2xl sm:text-4xl font-black">{t('myCollection')}</h2>
+      <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-6">
         {badges.map((b, i) => (
-          <div key={i} className="bg-white/5 p-6 rounded-[2rem] border border-white/10 text-center group hover:bg-white/10 transition-all">
-            <div className={`w-20 h-20 mx-auto rounded-full mb-4 flex items-center justify-center text-3xl ${b.unlocked ? 'bg-orange-500/20' : 'bg-white/5 opacity-40'}`}>
+          <div key={i} className="bg-white/5 p-3 sm:p-6 rounded-[1.5rem] sm:rounded-[2rem] border border-white/10 text-center group hover:bg-white/10 transition-all">
+            <div className={`w-14 h-14 sm:w-20 sm:h-20 mx-auto rounded-full mb-2 sm:mb-4 flex items-center justify-center text-2xl sm:text-3xl ${b.unlocked ? 'bg-orange-500/20' : 'bg-white/5 opacity-40'}`}>
               {b.name.split(' ')[0]}
             </div>
             <p className="font-bold text-white text-sm">{b.name.split(' ').slice(1).join(' ')}</p>
@@ -585,27 +586,27 @@ function RewardsView() {
 function ProfileView() {
   const { t } = useLanguage();
   return (
-    <div className="max-w-4xl mx-auto text-center space-y-12 py-12">
+    <div className="max-w-4xl mx-auto text-center space-y-6 sm:space-y-12 py-6 sm:py-12">
       <div className="relative inline-block">
-        <div className="w-48 h-48 bg-orange-500/20 rounded-full mx-auto border-8 border-[#0a0a0a] shadow-2xl overflow-hidden ring-4 ring-orange-500/30 flex items-center justify-center text-8xl">
+        <div className="w-32 h-32 sm:w-48 sm:h-48 bg-orange-500/20 rounded-full mx-auto border-8 border-[#0a0a0a] shadow-2xl overflow-hidden ring-4 ring-orange-500/30 flex items-center justify-center text-6xl sm:text-8xl">
           🏹
         </div>
       </div>
       <div>
-        <h2 className="text-5xl font-black mb-2">Young Explorer</h2>
-        <p className="text-orange-500 text-xl font-bold italic tracking-wide">Bala Kanda • Beginner</p>
+        <h2 className="text-3xl sm:text-5xl font-black mb-2">Young Explorer</h2>
+        <p className="text-orange-500 text-base sm:text-xl font-bold italic tracking-wide">Bala Kanda • Beginner</p>
       </div>
-      <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
-        <div className="bg-white/5 p-8 rounded-[2.5rem] border border-white/10">
-          <p className="text-4xl font-black mb-1">2</p>
+      <div className="grid grid-cols-3 gap-3 sm:gap-8 max-w-2xl mx-auto">
+        <div className="bg-white/5 p-4 sm:p-8 rounded-[1.5rem] sm:rounded-[2.5rem] border border-white/10">
+          <p className="text-2xl sm:text-4xl font-black mb-1">2</p>
           <p className="text-xs text-gray-500 uppercase font-black tracking-widest">{t('lessons')}</p>
         </div>
-        <div className="bg-white/5 p-8 rounded-[2.5rem] border border-white/10">
-          <p className="text-4xl font-black mb-1">5</p>
+        <div className="bg-white/5 p-4 sm:p-8 rounded-[1.5rem] sm:rounded-[2.5rem] border border-white/10">
+          <p className="text-2xl sm:text-4xl font-black mb-1">5</p>
           <p className="text-xs text-gray-500 uppercase font-black tracking-widest">{t('streak')}</p>
         </div>
-        <div className="bg-white/5 p-8 rounded-[2.5rem] border border-white/10">
-          <p className="text-4xl font-black mb-1">⭐ 5</p>
+        <div className="bg-white/5 p-4 sm:p-8 rounded-[1.5rem] sm:rounded-[2.5rem] border border-white/10">
+          <p className="text-2xl sm:text-4xl font-black mb-1">⭐ 5</p>
           <p className="text-xs text-gray-500 uppercase font-black tracking-widest">{t('stars')}</p>
         </div>
       </div>
@@ -657,17 +658,17 @@ function QuizView({ chapter, onBack, onDone }: { chapter: Chapter; onBack: () =>
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-[#0a0a0a] z-50 flex flex-col items-center justify-center p-8">
+      className="fixed inset-0 bg-[#0a0a0a] z-50 flex flex-col items-center justify-center p-4 sm:p-8">
       {loading ? (
         <div className="text-center space-y-4">
           <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-orange-400 font-bold">🧠 Generating quiz...</p>
         </div>
       ) : finished ? (
-        <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="text-center space-y-8 max-w-md">
-          <div className="text-8xl">{score === questions.length ? '🌟' : score >= questions.length / 2 ? '🎉' : '💪'}</div>
-          <h2 className="text-4xl font-black">Quiz Complete!</h2>
-          <p className="text-2xl">You got <span style={{ color: arcColor }} className="font-black">{score}/{questions.length}</span> correct!</p>
+        <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="text-center space-y-4 sm:space-y-8 max-w-md">
+          <div className="text-6xl sm:text-8xl">{score === questions.length ? '🌟' : score >= questions.length / 2 ? '🎉' : '💪'}</div>
+          <h2 className="text-2xl sm:text-4xl font-black">Quiz Complete!</h2>
+          <p className="text-lg sm:text-2xl">You got <span style={{ color: arcColor }} className="font-black">{score}/{questions.length}</span> correct!</p>
           <div className="flex gap-2 justify-center">
             {[...Array(questions.length)].map((_, i) => (
               <Star key={i} className={`w-8 h-8 ${i < score ? 'text-yellow-400 fill-yellow-400' : 'text-white/20'}`} />
@@ -679,7 +680,7 @@ function QuizView({ chapter, onBack, onDone }: { chapter: Chapter; onBack: () =>
           </div>
         </motion.div>
       ) : (
-        <div className="max-w-xl w-full space-y-8">
+        <div className="max-w-xl w-full space-y-4 sm:space-y-8">
           <div className="flex items-center justify-between">
             <button onClick={onBack} className="text-white/60 hover:text-white flex items-center gap-2">
               <ChevronLeft className="w-5 h-5" /> Back
@@ -688,7 +689,7 @@ function QuizView({ chapter, onBack, onDone }: { chapter: Chapter; onBack: () =>
               Question {current + 1} of {questions.length}
             </p>
           </div>
-          <h3 className="text-2xl font-bold text-gray-100 leading-relaxed">{questions[current].question}</h3>
+          <h3 className="text-lg sm:text-2xl font-bold text-gray-100 leading-relaxed">{questions[current].question}</h3>
           <div className="space-y-3">
             {questions[current].options.map((opt, idx) => {
               let bg = 'bg-white/10 hover:bg-white/20';
@@ -731,18 +732,18 @@ function GamesView() {
   ];
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-12">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 sm:space-y-12">
       <div className="flex items-center gap-4">
-        <h2 className="text-4xl font-black">🎮 Fun Activities</h2>
+        <h2 className="text-2xl sm:text-4xl font-black">🎮 Fun Activities</h2>
         <div className="h-px flex-1 bg-white/10" />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {games.map(g => (
           <motion.div key={g.id} whileHover={{ y: -6 }}
             onClick={() => setActiveGame(g.id)}
-            className="bg-white/5 p-8 rounded-[2rem] border border-white/10 cursor-pointer hover:bg-white/10 transition-all text-center space-y-4">
-            <div className="text-6xl">{g.emoji}</div>
-            <h3 className="text-2xl font-black" style={{ color: g.color }}>{g.title}</h3>
+            className="bg-white/5 p-5 sm:p-8 rounded-[1.5rem] sm:rounded-[2rem] border border-white/10 cursor-pointer hover:bg-white/10 transition-all text-center space-y-3 sm:space-y-4">
+            <div className="text-4xl sm:text-6xl">{g.emoji}</div>
+            <h3 className="text-xl sm:text-2xl font-black" style={{ color: g.color }}>{g.title}</h3>
             <p className="text-gray-400">{g.desc}</p>
             <button className="px-6 py-2 rounded-full font-bold text-sm" style={{ backgroundColor: g.color }}>Play Now</button>
           </motion.div>
@@ -771,22 +772,22 @@ function MatchGame({ onBack }: { onBack: () => void }) {
   };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4 sm:space-y-8">
       <div className="flex items-center gap-4">
         <button onClick={onBack} className="text-white/60 hover:text-white flex items-center gap-2">
           <ChevronLeft className="w-5 h-5" /> Back
         </button>
-        <h2 className="text-3xl font-black">🃏 Character Match</h2>
+        <h2 className="text-xl sm:text-3xl font-black">🃏 Character Match</h2>
         <span className="bg-orange-500 text-white text-sm font-black px-3 py-1 rounded-full">{matched.size}/{pairs.length}</span>
       </div>
       {matched.size === pairs.length ? (
-        <div className="text-center space-y-6 py-12">
-          <div className="text-8xl">🎉</div>
-          <h3 className="text-3xl font-black">All Matched!</h3>
+        <div className="text-center space-y-6 py-8 sm:py-12">
+          <div className="text-6xl sm:text-8xl">🎉</div>
+          <h3 className="text-2xl sm:text-3xl font-black">All Matched!</h3>
           <button onClick={onBack} className="px-8 py-3 rounded-xl bg-orange-500 font-bold">Play Again</button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-8">
+        <div className="grid grid-cols-2 gap-3 sm:gap-8">
           <div className="space-y-3">
             <p className="text-xs font-black uppercase tracking-widest text-orange-400 mb-4">Characters</p>
             {pairs.map(p => (
@@ -850,17 +851,17 @@ function WordScramble({ onBack }: { onBack: () => void }) {
   };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4 sm:space-y-8">
       <div className="flex items-center gap-4">
         <button onClick={onBack} className="text-white/60 hover:text-white flex items-center gap-2">
           <ChevronLeft className="w-5 h-5" /> Back
         </button>
-        <h2 className="text-3xl font-black">🔤 Word Scramble</h2>
+        <h2 className="text-xl sm:text-3xl font-black">🔤 Word Scramble</h2>
       </div>
       {done ? (
-        <div className="text-center space-y-6 py-12">
-          <div className="text-8xl">{score >= words.length / 2 ? '🌟' : '💪'}</div>
-          <h3 className="text-3xl font-black">Score: {score}/{words.length}</h3>
+        <div className="text-center space-y-6 py-8 sm:py-12">
+          <div className="text-6xl sm:text-8xl">{score >= words.length / 2 ? '🌟' : '💪'}</div>
+          <h3 className="text-2xl sm:text-3xl font-black">Score: {score}/{words.length}</h3>
           <button onClick={() => { setCurrentIdx(0); setScore(0); setDone(false); }}
             className="px-8 py-3 rounded-xl bg-emerald-500 font-bold">Play Again</button>
         </div>
