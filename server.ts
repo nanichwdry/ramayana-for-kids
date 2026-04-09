@@ -14,7 +14,9 @@ const __dirname = path.dirname(__filename);
 
 // Firebase Admin
 if (!admin.apps.length) {
+  const credJson = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
   admin.initializeApp({
+    credential: credJson ? admin.credential.cert(JSON.parse(credJson)) : admin.credential.applicationDefault(),
     projectId: 'ramayana-for-kids',
     storageBucket: 'ramayana-for-kids.firebasestorage.app',
   });
