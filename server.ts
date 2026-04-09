@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import { createServer as createViteServer } from "vite";
+
 import path from "path";
 import { fileURLToPath } from "url";
 import { GoogleGenAI, Modality } from "@google/genai";
@@ -56,7 +56,7 @@ function pcmToWav(pcm: Buffer, sampleRate: number): Buffer {
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = parseInt(process.env.PORT || '3000', 10);
 
   app.use(cors({
     origin: ['https://ramayana-for-kids.vercel.app', 'http://localhost:3000', 'http://localhost:5173'],
@@ -240,8 +240,8 @@ Soft storybook style, child-friendly, warm colors, cinematic composition, 16:9.`
     }
   });
 
-  // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
