@@ -153,7 +153,7 @@ function StoryPlayer({ chapter, onBack }: { chapter: Chapter, onBack: () => void
       const res = await fetch(`${API_BASE}/api/generate-image`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: `A child-friendly illustration for a Ramayana story page: "${pageText}"` }),
+        body: JSON.stringify({ prompt: `A child-friendly illustration for a Ramayana story page: "${pageText}"`, chapterId: chapter.id, pageIndex }),
       });
       const data = await res.json();
       if (data.image) {

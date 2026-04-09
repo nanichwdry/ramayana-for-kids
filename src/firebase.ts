@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 import firebaseConfig from "../firebase-applet-config.json";
 
 // Initialize Firebase SDK
@@ -13,5 +14,7 @@ console.log("Using Firestore database:", firebaseConfig.firestoreDatabaseId || "
 export const db = firebaseConfig.firestoreDatabaseId 
   ? getFirestore(app, firebaseConfig.firestoreDatabaseId)
   : getFirestore(app);
+
+export const storage = getStorage(app);
 
 export default app;

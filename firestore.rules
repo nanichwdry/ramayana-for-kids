@@ -64,6 +64,21 @@ service cloud.firestore {
       allow delete: if isAuthenticated() && resource.data.parentId == request.auth.uid;
     }
 
+    match /stories/{storyId} {
+      allow read: if true;
+      allow write: if false; // Server-only writes via Admin SDK
+    }
+
+    match /quizzes/{quizId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /story_images/{imageId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
     match /story_arcs/{arcId} {
       allow read: if true; // Publicly readable for the map
       allow write: if isAdmin();
