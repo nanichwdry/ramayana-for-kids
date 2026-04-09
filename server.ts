@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -57,6 +58,9 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
+  app.use(cors({
+    origin: ['https://ramayana-for-kids.vercel.app', 'http://localhost:3000', 'http://localhost:5173'],
+  }));
   app.use(express.json({ limit: '10mb' }));
 
   app.get("/api/health", (req, res) => {
