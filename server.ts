@@ -28,6 +28,9 @@ const vertexAI = new GoogleGenAI({
   location: process.env.GOOGLE_CLOUD_LOCATION || 'us-central1',
 });
 
+// In-memory cache for stories, quizzes, images
+const cache = new Map<string, any>();
+
 async function startServer() {
   const app = express();
   const PORT = parseInt(process.env.PORT || '3000');
@@ -54,6 +57,9 @@ async function startServer() {
       const { chapterTitle, language, moral } = req.body;
       if (!chapterTitle) return res.status(400).json({ error: "chapterTitle required" });
 
+      const cacheKey = `story_${chapterTitle}_${language}`;
+      if (cache.has(cacheKey)) return res.json({ pages: cache.get(cacheKey) });
+
       const langName = { en: 'English', te: 'Telugu', hi: 'Hindi', ta: 'Tamil' }[language as string] || 'English';
       const response = await gemini.models.generateContent({
         model: "gemini-2.5-flash",
@@ -64,7 +70,9 @@ Include the moral lesson "${moral || ''}" on the last page. Use vivid but simple
 
       const text = response.text || '';
       const pages = text.split('---').map((p: string) => p.trim()).filter((p: string) => p.length > 0);
-      res.json({ pages: pages.length > 0 ? pages : ["Story could not be generated."] });
+      const result = pages.length > 0 ? pages : ["Story could not be generated."];
+      cache.set(cacheKey, result);
+      res.json({ pages: result });
     } catch (e: any) {
       console.error("Story generation error:", e.message);
       res.status(500).json({ error: e.message });
@@ -76,6 +84,9 @@ Include the moral lesson "${moral || ''}" on the last page. Use vivid but simple
     try {
       const { chapterTitle, moral, language } = req.body;
       if (!chapterTitle) return res.status(400).json({ error: "chapterTitle required" });
+
+      const cacheKey = `quiz_${chapterTitle}_${language}`;
+      if (cache.has(cacheKey)) return res.json({ quiz: cache.get(cacheKey) });
 
       const langName = { en: 'English', te: 'Telugu', hi: 'Hindi', ta: 'Tamil' }[language as string] || 'English';
       const response = await gemini.models.generateContent({
@@ -89,6 +100,7 @@ correct is the 0-based index. Keep questions simple and fun for kids.`,
       let text = (response.text || '').trim();
       text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
       const quiz = JSON.parse(text);
+      cache.set(cacheKey, quiz);
       res.json({ quiz });
     } catch (e: any) {
       console.error("Quiz generation error:", e.message);
@@ -101,6 +113,9 @@ correct is the 0-based index. Keep questions simple and fun for kids.`,
     try {
       const { prompt } = req.body;
       if (!prompt) return res.status(400).json({ error: "prompt required" });
+
+      const cacheKey = `img_${prompt.substring(0, 100)}`;
+      if (cache.has(cacheKey)) return res.json({ image: cache.get(cacheKey) });
 
       const response = await vertexAI.models.generateContent({
         model: "gemini-2.5-flash-image",
@@ -121,7 +136,9 @@ Soft storybook style, child-friendly, warm colors, cinematic composition, 16:9.`
       for (const part of parts) {
         if ((part as any).inlineData?.data) {
           const { mimeType, data } = (part as any).inlineData;
-          return res.json({ image: `data:${mimeType};base64,${data}` });
+          const imageData = `data:${mimeType};base64,${data}`;
+          cache.set(cacheKey, imageData);
+          return res.json({ image: imageData });
         }
       }
       res.json({ image: null });

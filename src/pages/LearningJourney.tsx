@@ -170,6 +170,16 @@ function StoryPlayer({ chapter, onBack }: { chapter: Chapter, onBack: () => void
     const fetchStory = async () => {
       setLoading(true);
       try {
+        const cacheKey = `story_${chapter.id}_${language}`;
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+          const pages = JSON.parse(cached);
+          setStoryPages(pages);
+          if (pages.length > 0) generateSvg(0, pages[0]);
+          setLoading(false);
+          return;
+        }
+
         const res = await fetch(`${API_BASE}/api/generate-story`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -181,6 +191,7 @@ function StoryPlayer({ chapter, onBack }: { chapter: Chapter, onBack: () => void
         });
         const data = await res.json();
         const pages = data.pages && data.pages.length > 0 ? data.pages : ['Story could not be loaded. Please try again.'];
+        localStorage.setItem(cacheKey, JSON.stringify(pages));
         setStoryPages(pages);
         if (pages.length > 0) generateSvg(0, pages[0]);
       } catch (e) {
